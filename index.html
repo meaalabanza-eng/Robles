@@ -3,70 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <title>Wedding Seating Map</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-  body {
-    margin: 0;
-    font-family: "Playfair Display", serif;
-    background: #fff7fa;
-    color: #5a3e3e;
-  }
+  <title>Wedding Seating Map</title>
 
-  .screen {
-    display: none;
-    padding: 30px;
-  }
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+      background: #fafafa;
+    }
 
-  .active {
-    display: block;
-  }
+    h1 {
+      text-align: center;
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
 
-  h1 {
-    color: #d4af37;
-    text-shadow: 0 0 4px rgba(212,175,55,0.4);
-  }
+    #guest-search {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
 
-  #guest-search {
-    width: 100%;
-    padding: 14px;
-    border: 2px solid #d4af37;
-    border-radius: 10px;
-    font-size: 18px;
-    background: #fff;
-  }
+    #suggestions {
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      display: none;
+      font-size: 18px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
 
-  #suggestions {
-    margin-top: 10px;
-    background: #fff;
-    border: 2px solid #d4af37;
-    border-radius: 10px;
-    display: none;
-    max-height: 200px;
-    overflow-y: auto;
-  }
+    .suggestion-item {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
 
-  .suggestion-item {
-    padding: 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #f7c6d0;
-  }
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
 
-  .suggestion-item:hover {
-    background: #fdf3f7;
-    color: #d4af37;
-    font-weight: 600;
-  }
+    .suggestion-item:hover {
+      background: #f0f0f0;
+      cursor: pointer;
+    }
 
-  .button {
-    margin-top: 30px;
-    padding: 14px 20px;
-    background: #d4af37;
-    color: white;
-    border-radius: 10px;
-    font-size: 20px;
-    text-align: center;
-    cursor: pointer;
-  }
+    /* Make SVG responsive */
+    #map-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+    }
+
+    /* Highlight seat */
+    .highlight {
+      stroke: #ff0000;
+      stroke-width: 4px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Wedding Seating Map</h1>
+
+  <input id="guest-search" type="text" placeholder="Search guest name…">
+
+  <div id="suggestions"></div>
+
+  <div id="map-container">
+    <!-- Your SVG goes here -->
+    <!-- Paste your full SVG exactly as-is -->
+  </div>
+
+  <script>
+    /* Your guest list */
+    const guests = [
+      /* paste your full guest list here */
+    ];
+
+    /* Your seat → table map */
+    const seatToTable = {
+      /* paste your seatToTable here */
+    };
+
+    const searchInput = document.getElementById("guest-search");
+    const suggestionsBox = document.getElementById("suggestions");
+
+    searchInput.addEventListener("input", function () {
+      let query = this.value.toLowerCase().trim();
+
+      if (query.length < 2) {
+        suggestionsBox.style.display = "none";
+        return;
+      }
+
+      const matches = guests.filter(g =>
+        g.name.toLowerCase().includes(query)
+      );
+
+      if (matches.length === 0) {
+        suggestionsBox.style.display = "none";
+        return;
+      }
+
+      suggestionsBox.innerHTML = matches
+        .map(m => `<div class="suggestion-item" data-seat="${m.seat}">
+                     ${m.name}
+                   </div>`)
+        .join("");
+
+      suggestionsBox.style.display = "block";
+    });
+
+    suggestionsBox.addEventListener("click", function (e) {
+      if (e.target.classList.contains("suggestion-item")) {
+        const seatId = e.target.getAttribute("data-seat");
+        const name = e.target.innerText;
+
+        searchInput.value = name;
+        suggestionsBox.style.display = "none";
+
+        highlightSeat(seatId);
+      }
+    });
+
+    function highlightSeat(seatId) {
+      document.querySelectorAll("ellipse, circle, rect").forEach(el => {
+        el.classList.remove("highlight");
+      });
+
+      const seat = document.getElementById(seatId);
+      if (seat) {
+        seat.classList.add("highlight");
+        seat.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  </script>
+
+</body>
+</html>
 
   /* ⭐ THIS FIXES DISTORTION ⭐ */
   .map-container {
