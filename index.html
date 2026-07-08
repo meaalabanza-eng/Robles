@@ -111,9 +111,9 @@
   <div id="map-section" style="display:none;">
     <div class="section-title">Your Seat on the Map</div>
 
-    <!-- ⭐ SVG LOADED EXTERNALLY (NO CORRUPTION) ⭐ -->
-    <div class="map-container">
-    <svg
+    <div class="map-container" id="map-container">
+
+   <svg
    version="1.1"
    id="svg1"
    width="1200"
@@ -731,6 +731,8 @@
 </svg>
 
 
+    </div>
+
     <div class="back" onclick="goBackToDetails()">← Back to details</div>
   </div>
 
@@ -892,27 +894,16 @@
       document.getElementById("details-section").style.display = "block";
     }
 
-    /* ⭐ HIGHLIGHT FIX — WAIT FOR SVG TO LOAD ⭐ */
+    /* ⭐ HIGHLIGHT FIX — WORKS WITH INLINE SVG ⭐ */
     function highlightSeat(seatId) {
-      const svgObject = document.getElementById("svgMap");
-      const svgDoc = svgObject.contentDocument;
+      const svg = document.querySelector("#map-container svg");
+      if (!svg) return;
 
-      if (!svgDoc) {
-        setTimeout(() => highlightSeat(seatId), 100);
-        return;
-      }
-
-      svgDoc.querySelectorAll("ellipse, circle, rect").forEach(el => {
+      svg.querySelectorAll("ellipse, circle, rect").forEach(el => {
         el.classList.remove("highlight");
       });
 
-      const seat = svgDoc.getElementById(seatId);
+      const seat = svg.querySelector(`#${seatId}`);
       if (seat) {
         seat.classList.add("highlight");
-        seat.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }
-  </script>
-
-</body>
-</html>
+        seat.scrollInto
