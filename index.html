@@ -111,9 +111,9 @@
   <div id="map-section" style="display:none;">
     <div class="section-title">Your Seat on the Map</div>
 
-    <!-- ⭐⭐⭐ SVG LOADED EXTERNALLY — NO CORRUPTION POSSIBLE ⭐⭐⭐ -->
+    <!-- ⭐ SVG LOADED EXTERNALLY (NO CORRUPTION) ⭐ -->
     <div class="map-container">
-      <object type="image/svg+xml" data="map.svg"></object>
+      <object id="svgMap" type="image/svg+xml" data="map.svg"></object>
     </div>
 
     <div class="back" onclick="goBackToDetails()">← Back to details</div>
@@ -277,9 +277,15 @@
       document.getElementById("details-section").style.display = "block";
     }
 
+    /* ⭐ HIGHLIGHT FIX — WAIT FOR SVG TO LOAD ⭐ */
     function highlightSeat(seatId) {
-      const svgDoc = document.querySelector("object").contentDocument;
-      if (!svgDoc) return;
+      const svgObject = document.getElementById("svgMap");
+      const svgDoc = svgObject.contentDocument;
+
+      if (!svgDoc) {
+        setTimeout(() => highlightSeat(seatId), 100);
+        return;
+      }
 
       svgDoc.querySelectorAll("ellipse, circle, rect").forEach(el => {
         el.classList.remove("highlight");
