@@ -6,42 +6,49 @@
 
   <title>Wedding Seating Map</title>
 
+  <!-- ALL CSS MUST BE INSIDE THIS STYLE TAG -->
   <style>
+    /* GLOBAL FONT FIX */
     html {
-      font-size: 20px; /* fixes tiny mobile fonts */
+      font-size: 20px;
     }
 
     body {
       margin: 0;
       padding: 20px;
-      font-family: Arial, sans-serif;
+      font-family: "Arial", sans-serif;
       background: #fafafa;
-      font-size: 1rem; /* now 20px */
+      color: #333;
+      font-size: 1rem;
     }
 
     h1 {
       text-align: center;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       margin-bottom: 20px;
+      color: #d4af37;
     }
 
+    /* SEARCH BAR */
     #guest-search {
       width: 100%;
       padding: 14px;
       font-size: 1rem;
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid #ccc;
       box-sizing: border-box;
+      margin-bottom: 10px;
     }
 
+    /* SUGGESTIONS */
     #suggestions {
       margin-top: 10px;
       border: 1px solid #ccc;
-      border-radius: 8px;
+      border-radius: 10px;
       background: white;
       display: none;
       font-size: 1rem;
-      max-height: 250px;
+      max-height: 300px;
       overflow-y: auto;
     }
 
@@ -59,23 +66,60 @@
       cursor: pointer;
     }
 
-    /* Responsive SVG */
-    #map-container {
+    /* SECTION TITLES */
+    .section-title {
+      font-size: 1.3rem;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      color: #d4af37;
+      font-weight: bold;
+    }
+
+    /* BUTTONS / LINKS */
+    .back {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: #d4af37;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    /* ⭐ THIS FIXES DISTORTION ⭐ */
+    .map-container {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(212,175,55,0.15);
+      overflow: scroll;
       width: 100%;
-      overflow-x: auto;
+      height: 80vh;
       margin-top: 20px;
     }
 
     svg {
-      width: 100%;
+      width: auto;
       height: auto;
+      max-width: none;
+      max-height: none;
+      display: block;
     }
 
-    /* Highlight seat */
     .highlight {
-      stroke: #ff0000;
-      stroke-width: 4px;
+      fill: #f7c6d0 !important;
+      stroke: #d4af37 !important;
+      stroke-width: 4 !important;
+      filter: drop-shadow(0 0 12px rgba(212,175,55,0.8));
     }
+
+    .table-highlight {
+      stroke: #d4af37 !important;
+      stroke-width: 4 !important;
+      filter: drop-shadow(0 0 14px rgba(212,175,55,0.6));
+    }
+
+    /* ⭐ ZOOM REMOVED ⭐ */
+    .zoom-target { }
+    .zoomed { }
   </style>
 </head>
 
@@ -83,11 +127,27 @@
 
   <h1>Wedding Seating Map</h1>
 
-  <input id="guest-search" type="text" placeholder="Search your name…">
-
+  <!-- SEARCH -->
+  <input id="guest-search" type="text" placeholder="Search guest name…">
   <div id="suggestions"></div>
 
-  <div id="map-container">
+  <!-- PHASE 1: FIND YOUR SEAT -->
+  <div id="find-seat-section">
+    <div class="section-title">Find Your Seat</div>
+    <p>Search your name above to find your seat.</p>
+  </div>
+
+  <!-- PHASE 2: YOUR SEATING DETAILS -->
+  <div id="details-section" style="display:none;">
+    <div class="section-title">Your Seating Details</div>
+    <div id="details-content"></div>
+    <div class="back" onclick="goBackToSearch()">← Back to search</div>
+  </div>
+
+  <!-- PHASE 3: YOUR SEAT ON THE MAP -->
+  <div id="map-section" style="display:none;">
+    <div class="section-title">Your Seat on the Map</div>
+    <div class="map-container">
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
@@ -707,7 +767,8 @@
        y="535.92645"
        style="font-size:53.3333px;fill:#a0892c">7</tspan></text>
 </svg>
-
+    </div>
+    <div class="back" onclick="goBackToDetails()">← Back to details</div>
   </div>
 
   <script>
@@ -787,9 +848,7 @@ const guests = [
 ];
 </script>
 
-    ];
-
-    <!-- SEAT → TABLE MAP -->
+   <!-- SEAT → TABLE MAP -->
 <script>
 const seatToTable = {
   "seat1-1": "table1","seat1-2": "table1","seat1-3": "table1","seat1-4": "table1","seat1-5": "table1","seat1-6": "table1","seat1-7": "table1","seat1-8": "table1",
@@ -802,8 +861,6 @@ const seatToTable = {
   "seat7-1": "table7","seat7-2": "table7","seat7-3": "table7","seat7-4": "table7","seat7-5": "table7","seat7-6": "table7","seat7-7": "table7","seat7-8": "table7","seat7-9": "table7","seat7-10": "table7"
 };
 </script>
-
-    };
 
     const searchInput = document.getElementById("guest-search");
     const suggestionsBox = document.getElementById("suggestions");
@@ -842,9 +899,39 @@ const seatToTable = {
         searchInput.value = name;
         suggestionsBox.style.display = "none";
 
-        highlightSeat(seatId);
+        showDetails(name, seatId);
       }
     });
+
+    function showDetails(name, seatId) {
+      document.getElementById("find-seat-section").style.display = "none";
+      document.getElementById("details-section").style.display = "block";
+
+      const table = seatToTable[seatId] || "Unknown";
+
+      document.getElementById("details-content").innerHTML = `
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Seat:</strong> ${seatId}</p>
+        <p><strong>Table:</strong> ${table}</p>
+        <button onclick="showMap('${seatId}')">Show me my seat</button>
+      `;
+    }
+
+    function showMap(seatId) {
+      document.getElementById("details-section").style.display = "none";
+      document.getElementById("map-section").style.display = "block";
+      highlightSeat(seatId);
+    }
+
+    function goBackToSearch() {
+      document.getElementById("details-section").style.display = "none";
+      document.getElementById("find-seat-section").style.display = "block";
+    }
+
+    function goBackToDetails() {
+      document.getElementById("map-section").style.display = "none";
+      document.getElementById("details-section").style.display = "block";
+    }
 
     function highlightSeat(seatId) {
       document.querySelectorAll("ellipse, circle, rect").forEach(el => {
