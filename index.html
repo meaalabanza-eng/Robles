@@ -1,40 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta charset="UTF-8">
-<title>Wedding Seating Map</title>
-<!DOCTYPE html>
-<html lang="en">
-<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Wedding Seating Map</title>
+
   <style>
-html {
-  font-size: 20px;
-}
- body {
-  font-size: 1rem; /* becomes 20px because of html rule */
-}
+    html {
+      font-size: 20px; /* fixes tiny mobile fonts */
+    }
 
-input, button {
-  font-size: 1rem;
-}
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      font-size: 1rem; /* now 20px */
+    }
 
-#suggestions {
-  font-size: 1rem;
-}
-
-.suggestion-item {
-  padding: 14px;
-}
+    h1 {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+    }
 
     #guest-search {
       width: 100%;
       padding: 14px;
-      font-size: 18px;
+      font-size: 1rem;
       border-radius: 8px;
       border: 1px solid #ccc;
       box-sizing: border-box;
@@ -46,13 +40,13 @@ input, button {
       border-radius: 8px;
       background: white;
       display: none;
-      font-size: 18px;
+      font-size: 1rem;
       max-height: 250px;
       overflow-y: auto;
     }
 
     .suggestion-item {
-      padding: 12px;
+      padding: 14px;
       border-bottom: 1px solid #eee;
     }
 
@@ -65,7 +59,7 @@ input, button {
       cursor: pointer;
     }
 
-    /* Make SVG responsive */
+    /* Responsive SVG */
     #map-container {
       width: 100%;
       overflow-x: auto;
@@ -84,162 +78,17 @@ input, button {
     }
   </style>
 </head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <body>
 
   <h1>Wedding Seating Map</h1>
 
-  <input id="guest-search" type="text" placeholder="Search guest name…">
+  <input id="guest-search" type="text" placeholder="Search your name…">
 
   <div id="suggestions"></div>
 
   <div id="map-container">
-    <!-- Your SVG goes here -->
-    <!-- Paste your full SVG exactly as-is -->
-  </div>
-
-  <script>
-    /* Your guest list */
-    const guests = [
-      /* paste your full guest list here */
-    ];
-
-    /* Your seat → table map */
-    const seatToTable = {
-      /* paste your seatToTable here */
-    };
-
-    const searchInput = document.getElementById("guest-search");
-    const suggestionsBox = document.getElementById("suggestions");
-
-    searchInput.addEventListener("input", function () {
-      let query = this.value.toLowerCase().trim();
-
-      if (query.length < 2) {
-        suggestionsBox.style.display = "none";
-        return;
-      }
-
-      const matches = guests.filter(g =>
-        g.name.toLowerCase().includes(query)
-      );
-
-      if (matches.length === 0) {
-        suggestionsBox.style.display = "none";
-        return;
-      }
-
-      suggestionsBox.innerHTML = matches
-        .map(m => `<div class="suggestion-item" data-seat="${m.seat}">
-                     ${m.name}
-                   </div>`)
-        .join("");
-
-      suggestionsBox.style.display = "block";
-    });
-
-    suggestionsBox.addEventListener("click", function (e) {
-      if (e.target.classList.contains("suggestion-item")) {
-        const seatId = e.target.getAttribute("data-seat");
-        const name = e.target.innerText;
-
-        searchInput.value = name;
-        suggestionsBox.style.display = "none";
-
-        highlightSeat(seatId);
-      }
-    });
-
-    function highlightSeat(seatId) {
-      document.querySelectorAll("ellipse, circle, rect").forEach(el => {
-        el.classList.remove("highlight");
-      });
-
-      const seat = document.getElementById(seatId);
-      if (seat) {
-        seat.classList.add("highlight");
-        seat.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }
-  </script>
-
-</body>
-</html>
-
-  /* ⭐ THIS FIXES DISTORTION ⭐ */
-  .map-container {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(212,175,55,0.15);
-    overflow: scroll;
-    width: 100%;
-    height: 80vh;
-  }
-
-  svg {
-    width: auto;
-    height: auto;
-    max-width: none;
-    max-height: none;
-    display: block;
-  }
-
-  .highlight {
-    fill: #f7c6d0 !important;
-    stroke: #d4af37 !important;
-    stroke-width: 4 !important;
-    filter: drop-shadow(0 0 12px rgba(212,175,55,0.8));
-  }
-
-  .table-highlight {
-    stroke: #d4af37 !important;
-    stroke-width: 4 !important;
-    filter: drop-shadow(0 0 14px rgba(212,175,55,0.6));
-  }
-
-  /* ⭐ ZOOM REMOVED ⭐ */
-  .zoom-target { }
-  .zoomed { }
-
-  .back {
-    margin-top: 20px;
-    font-size: 18px;
-    color: #d4af37;
-    cursor: pointer;
-  }
-</style>
-</head>
-
-<body>
-
-<!-- PAGE 1 — SEARCH -->
-<div id="screen-search" class="screen active">
-  <h1>Find Your Seat</h1>
-  <input id="guest-search" type="text" placeholder="Search your name...">
-  <div id="suggestions"></div>
-</div>
-
-<!-- PAGE 2 — DETAILS -->
-<div id="screen-details" class="screen">
-  <h1>Your Seating Details</h1>
-  <p id="guest-name"></p>
-  <p id="guest-table"></p>
-  <p id="guest-seat"></p>
-
-  <div class="button" onclick="goToMap()">Show me my seat</div>
-  <div class="back" onclick="goBackToSearch()">← Back to search</div>
-</div>
-
-<!-- PAGE 3 — MAP -->
-<div id="screen-map" class="screen">
-  <h1>Your Seat on the Map</h1>
-
-  <div class="map-container">
-
-    <!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
-    <!-- ⭐ PASTE YOUR FULL SVG HERE ⭐ -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
@@ -858,16 +707,11 @@ input, button {
        y="535.92645"
        style="font-size:53.3333px;fill:#a0892c">7</tspan></text>
 </svg>
-    <!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
 
   </div>
 
-  <div class="back" onclick="goBackToDetails()">← Back to details</div>
-</div>
-
-<!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
-<!-- ⭐ PASTE YOUR GUEST LIST HERE ⭐ -->
-<!-- GUEST LIST -->
+  <script>
+  <!-- GUEST LIST -->
 <script>
 const guests = [
   { name: "Angela Evangelista", seat: "seat1-2" },
@@ -942,19 +786,10 @@ const guests = [
   { name: "Pamela Picondo", seat: "seat3-p" }
 ];
 </script>
-<!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
-<script>
-/* Example:
-const guests = [
-  { name: "Angela Evangelista", seat: "seat1-2" },
-  ...
-];
-*/
-</script>
 
-<!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
-<!-- ⭐ PASTE YOUR SEAT → TABLE MAP HERE ⭐ -->
-<!-- SEAT → TABLE MAP -->
+    ];
+
+    <!-- SEAT → TABLE MAP -->
 <script>
 const seatToTable = {
   "seat1-1": "table1","seat1-2": "table1","seat1-3": "table1","seat1-4": "table1","seat1-5": "table1","seat1-6": "table1","seat1-7": "table1","seat1-8": "table1",
@@ -968,106 +803,61 @@ const seatToTable = {
 };
 </script>
 
-<!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
-<script>
-/* Example:
-const seatToTable = {
-  "seat1-1": "table1",
-  ...
-};
-*/
-</script>
+    };
 
-<!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
-<!-- ⭐ PASTE YOUR AUTOCOMPLETE SCRIPT HERE ⭐ -->
-<!-- AUTOCOMPLETE -->
-<script>
-const searchInput = document.getElementById("guest-search");
-const suggestionBox = document.getElementById("suggestions");
+    const searchInput = document.getElementById("guest-search");
+    const suggestionsBox = document.getElementById("suggestions");
 
-searchInput.addEventListener("input", function () {
-  let query = this.value.toLowerCase().trim();
+    searchInput.addEventListener("input", function () {
+      let query = this.value.toLowerCase().trim();
 
-  if (query.length < 2) {
-    suggestionBox.style.display = "none";
-    return;
-  }
+      if (query.length < 2) {
+        suggestionsBox.style.display = "none";
+        return;
+      }
 
-  const matches = guests.filter(g =>
-    g.name.toLowerCase().includes(query)
-  );
+      const matches = guests.filter(g =>
+        g.name.toLowerCase().includes(query)
+      );
 
-  if (matches.length === 0) {
-    suggestionBox.style.display = "none";
-    return;
-  }
+      if (matches.length === 0) {
+        suggestionsBox.style.display = "none";
+        return;
+      }
 
-  suggestionBox.innerHTML = matches
-    .map(m => `<div class="suggestion-item" data-seat="${m.seat}">
-                 ${m.name}
-               </div>`)
-    .join("");
+      suggestionsBox.innerHTML = matches
+        .map(m => `<div class="suggestion-item" data-seat="${m.seat}">
+                     ${m.name}
+                   </div>`)
+        .join("");
 
-  suggestionBox.style.display = "block";
-});
+      suggestionsBox.style.display = "block";
+    });
 
-suggestionBox.addEventListener("click", function (e) {
-  if (e.target.classList.contains("suggestion-item")) {
-    const seatId = e.target.getAttribute("data-seat");
-    const guest = guests.find(g => g.seat === seatId);
+    suggestionsBox.addEventListener("click", function (e) {
+      if (e.target.classList.contains("suggestion-item")) {
+        const seatId = e.target.getAttribute("data-seat");
+        const name = e.target.innerText;
 
-    document.getElementById("guest-name").innerText = "Guest: " + guest.name;
-    document.getElementById("guest-table").innerText = "Table: " + seatToTable[seatId].replace("table","");
-    document.getElementById("guest-seat").innerText = "Seat: " + seatId;
+        searchInput.value = name;
+        suggestionsBox.style.display = "none";
 
-    window.selectedSeat = seatId;
+        highlightSeat(seatId);
+      }
+    });
 
-    showScreen("screen-details");
-  }
-});
-</script>
+    function highlightSeat(seatId) {
+      document.querySelectorAll("ellipse, circle, rect").forEach(el => {
+        el.classList.remove("highlight");
+      });
 
-<!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
-<script>
-/* Your autocomplete JS goes here */
-</script>
-
-<script>
-function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-}
-
-function goToMap() {
-  showScreen("screen-map");
-  highlightSeat(window.selectedSeat);
-}
-
-function goBackToSearch() {
-  showScreen("screen-search");
-}
-
-function goBackToDetails() {
-  showScreen("screen-details");
-}
-</script>
-
-<script>
-function highlightSeat(seatId) {
-  document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
-  document.querySelectorAll('.table-highlight').forEach(el => el.classList.remove('table-highlight'));
-
-  const seat = document.getElementById(seatId);
-  if (seat) seat.classList.add('highlight');
-
-  const tableId = seatToTable[seatId];
-  const table = document.getElementById(tableId);
-
-  if (table) {
-    table.classList.add('table-highlight');
-  }
-}
-</script>
+      const seat = document.getElementById(seatId);
+      if (seat) {
+        seat.classList.add("highlight");
+        seat.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  </script>
 
 </body>
 </html>
