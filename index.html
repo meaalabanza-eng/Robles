@@ -1,87 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wedding Seating Map</title>
+<meta charset="UTF-8">
+<title>Wedding Seating Map</title>
 
-  <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      background: #f4d7d7;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: "Playfair Display", serif;
+    background: #fff7fa;
+    color: #5a3e3e;
+  }
 
-    h1 {
-      text-align: center;
-      color: #d4af37;
-      margin-bottom: 20px;
-    }
+  .screen {
+    display: none;
+    padding: 30px;
+  }
 
-    #guest-search {
-      width: 100%;
-      padding: 14px;
-      font-size: 1rem;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      margin-bottom: 10px;
-    }
+  .active {
+    display: block;
+  }
 
-    #suggestions {
-      display: none;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      max-height: 300px;
-      overflow-y: auto;
-    }
+  h1 {
+    color: #d4af37;
+    text-shadow: 0 0 4px rgba(212,175,55,0.4);
+  }
 
-    .suggestion-item {
-      padding: 14px;
-      border-bottom: 1px solid #eee;
-    }
+  #guest-search {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #d4af37;
+    border-radius: 10px;
+    font-size: 18px;
+    background: #fff;
+  }
 
-    .suggestion-item:hover {
-      background: #f0f0f0;
-      cursor: pointer;
-    }
+  #suggestions {
+    margin-top: 10px;
+    background: #fff;
+    border: 2px solid #d4af37;
+    border-radius: 10px;
+    display: none;
+    max-height: 200px;
+    overflow-y: auto;
+  }
 
-    .map-container {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 8px 20px rgba(212,175,55,0.15);
-      overflow: scroll;
-      width: 100%;
-      height: 80vh;
-      margin-top: 20px;
-    }
+  .suggestion-item {
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f7c6d0;
+  }
 
-    .highlight {
-      fill: #f7c6d0 !important;
-      stroke: #d4af37 !important;
-      stroke-width: 4 !important;
-      filter: drop-shadow(0 0 12px rgba(212,175,55,0.8));
-    }
-  </style>
+  .suggestion-item:hover {
+    background: #fdf3f7;
+    color: #d4af37;
+    font-weight: 600;
+  }
+
+  .button {
+    margin-top: 30px;
+    padding: 14px 20px;
+    background: #d4af37;
+    color: white;
+    border-radius: 10px;
+    font-size: 20px;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  /* ⭐ THIS FIXES DISTORTION ⭐ */
+  .map-container {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(212,175,55,0.15);
+    overflow: scroll;
+    width: 100%;
+    height: 80vh;
+  }
+
+  svg {
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    display: block;
+  }
+
+  .highlight {
+    fill: #f7c6d0 !important;
+    stroke: #d4af37 !important;
+    stroke-width: 4 !important;
+    filter: drop-shadow(0 0 12px rgba(212,175,55,0.8));
+  }
+
+  .table-highlight {
+    stroke: #d4af37 !important;
+    stroke-width: 4 !important;
+    filter: drop-shadow(0 0 14px rgba(212,175,55,0.6));
+  }
+
+  /* ⭐ ZOOM REMOVED ⭐ */
+  .zoom-target { }
+  .zoomed { }
+
+  .back {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #d4af37;
+    cursor: pointer;
+  }
+</style>
 </head>
 
 <body>
 
-<h1>Your Seat in Our Love Story</h1>
-
-<input id="guest-search" type="text" placeholder="Search guest name…">
-<div id="suggestions"></div>
-
-<div id="details-section" style="display:none;">
-  <div id="details-content"></div>
-  <div class="back" onclick="goBack()">← Back</div>
+<!-- PAGE 1 — SEARCH -->
+<div id="screen-search" class="screen active">
+  <h1>Find Your Seat</h1>
+  <input id="guest-search" type="text" placeholder="Search your name...">
+  <div id="suggestions"></div>
 </div>
 
-<div id="map-section" style="display:none;">
-  <div class="map-container" id="map-container">
-<svg
+<!-- PAGE 2 — DETAILS -->
+<div id="screen-details" class="screen">
+  <h1>Your Seat in Our Love Story</h1>
+  <p id="guest-name"></p>
+  <p id="guest-table"></p>
+  <p id="guest-seat"></p>
+
+  <div class="button" onclick="goToMap()">Show me my seat</div>
+  <div class="back" onclick="goBackToSearch()">← Back to search</div>
+</div>
+
+<!-- PAGE 3 — MAP -->
+<div id="screen-map" class="screen">
+  <h1>Your Seat on the Map</h1>
+
+  <div class="map-container">
+
+    <svg
    version="1.1"
    id="svg1"
    width="1200"
@@ -130,9 +188,9 @@
      transform="rotate(90)" />
   <ellipse
      style="fill:#f4d7d7;stroke-width:0.614339"
-     id="seat1-1"
-     cx="50.574005"
-     cy="111.28104"
+     id="seat6-10"
+     cx="827.5885"
+     cy="319.00891"
      rx="21.880136"
      ry="22.702505" />
   <ellipse
@@ -153,21 +211,21 @@
      style="fill:#f4d7d7;stroke-width:0.614339"
      id="seat1-8"
      cx="50.574005"
-     cy="210.91982"
+     cy="159.26855"
      rx="21.880136"
      ry="22.702505" />
   <ellipse
      style="fill:#f4d7d7;stroke-width:0.614339"
      id="seat1-7"
      cx="50.574005"
-     cy="306.77481"
+     cy="255.12355"
      rx="21.880136"
      ry="22.702505" />
   <ellipse
      style="fill:#f4d7d7;stroke-width:0.614339"
      id="seat1-6"
      cx="50.574005"
-     cy="401.36862"
+     cy="349.71738"
      rx="21.880136"
      ry="22.702505" />
   <ellipse
@@ -258,7 +316,7 @@
      style="fill:#f4d7d7;stroke-width:0.614339"
      id="seat6-6"
      cx="319.3873"
-     cy="-1133.9364"
+     cy="-1158.6392"
      rx="23.333128"
      ry="21.288782"
      transform="rotate(90)" />
@@ -266,7 +324,7 @@
      style="fill:#f4d7d7;stroke-width:0.614339"
      id="seat6-7"
      cx="319.3873"
-     cy="-1040.5023"
+     cy="-1076.0243"
      rx="23.333128"
      ry="21.288782"
      transform="rotate(90)" />
@@ -274,15 +332,15 @@
      style="fill:#f4d7d7;stroke-width:0.614339"
      id="seat6-8"
      cx="319.3873"
-     cy="-950.61646"
+     cy="-993.40948"
      rx="23.333128"
      ry="21.288782"
      transform="rotate(90)" />
   <ellipse
      style="fill:#f4d7d7;stroke-width:0.614339"
-     id="ellipse27"
+     id="seat6-9"
      cx="319.3873"
-     cy="-861.91315"
+     cy="-910.79468"
      rx="23.333128"
      ry="21.288782"
      transform="rotate(90)" />
@@ -698,242 +756,206 @@
        style="font-size:53.3333px;fill:#a0892c">7</tspan></text>
 </svg>
 
-
   </div>
 
   <div class="back" onclick="goBackToDetails()">← Back to details</div>
 </div>
 
+<!-- GUEST LIST -->
 <script>
-  const seatToTable = {
-    "seat1-1": "table1",
-    "seat1-2": "table1",
-    "seat1-3": "table1",
-    "seat1-4": "table1",
-    "seat1-5": "table1",
-    "seat1-6": "table1",
-    "seat1-7": "table1",
-    "seat1-8": "table1",
+const guests = [
+  { name: "Angela Evangelista", seat: "seat1-2" },
+  { name: "Mark Evangelista", seat: "seat1-3" },
+  { name: "Melchiah Evangelista", seat: "seat1-4" },
+  { name: "Ethan Elchico", seat: "seat1-5" },
+  { name: "Ezekiel Plana", seat: "seat1-6" },
+  { name: "Ethan Plana", seat: "seat1-7" },
+  { name: "Johanna Plana", seat: "seat1-8" },
+  { name: "Aimee Sofocado", seat: "seat6-10" },
 
-    "seat2-1": "table2",
-    "seat2-2": "table2",
-    "seat2-3": "table2",
-    "seat2-4": "table2",
-    "seat2-5": "table2",
-    "seat2-6": "table2",
-    "seat2-7": "table2",
-    "seat2-8": "table2",
+  { name: "Daisy Esturas", seat: "seat2-2" },
+  { name: "Bernard Esturas", seat: "seat2-3" },
+  { name: "Lucia Esturas", seat: "seat2-4" },
+  { name: "Lucas Esturas", seat: "seat2-5" },
+  { name: "Eloise Plana", seat: "seat2-6" },
+  { name: "Erin Plana", seat: "seat2-7" },
+  { name: "Nicole Plana", seat: "seat2-8" },
+  { name: "Jerich Plana", seat: "seat2-1" },
 
-    "seat3-a": "table3",
-    "seat3-b": "table3",
-    "seat3-c": "table3",
-    "seat3-d": "table3",
-    "seat3-e": "table3",
-    "seat3-f": "table3",
-    "seat3-g": "table3",
-    "seat3-h": "table3",
-    "seat3-i": "table3",
-    "seat3-j": "table3",
-    "seat3-k": "table3",
-    "seat3-l": "table3",
-    "seat3-m": "table3",
-    "seat3-n": "table3",
-    "seat3-o": "table3",
-    "seat3-p": "table3",
+  { name: "Nathan Osorio", seat: "seat6-1" },
+  { name: "Sarah Osorio", seat: "seat6-2" },
+  { name: "Therese Empestan", seat: "seat6-3" },
+  { name: "Analiza Villarino", seat: "seat6-4" },
+  { name: "Richard Villarino", seat: "seat6-5" },
+  { name: "Angelo Ayaman", seat: "seat6-6" },
+  { name: "Jackie Ayaman", seat: "seat6-7" },
+  { name: "Iza Almanza", seat: "seat6-8" },
+  { name: "Ace Almanza", seat: "seat6-9" },
 
-    "seat4-1": "table4",
-    "seat4-2": "table4",
-    "seat4-3": "table4",
+  { name: "Ivan Robles", seat: "seat5-1" },
+  { name: "Molly Robles", seat: "seat5-2" },
+  { name: "Cia Gopez", seat: "seat5-3" },
+  { name: "Keanu Robles", seat: "seat5-4" },
+  { name: "Gabriel Robles", seat: "seat5-5" },
+  { name: "Jonas Robles", seat: "seat5-6" },
+  { name: "Jay-Bee Alsaybar", seat: "seat5-7" },
+  { name: "Princess Alsaybar", seat: "seat5-8" },
+  { name: "Ken-Vee Hopcraft", seat: "seat5-9" },
+  { name: "Calvin Hopcraft", seat: "seat5-10" },
 
-    "seat5-1": "table5",
-    "seat5-2": "table5",
-    "seat5-3": "table5",
-    "seat5-4": "table5",
-    "seat5-5": "table5",
-    "seat5-6": "table5",
-    "seat5-7": "table5",
-    "seat5-8": "table5",
-    "seat5-9": "table5",
-    "seat5-10": "table5",
+  { name: "Brix Viguilla", seat: "seat7-1" },
+  { name: "Lavinia Sabado", seat: "seat7-2" },
+  { name: "Rolando Sabado", seat: "seat7-3" },
+  { name: "Paolo Pineda", seat: "seat7-4" },
+  { name: "Joy Demate", seat: "seat7-5" },
+  { name: "Oluwaleke Ayeni", seat: "seat7-6" },
+  { name: "Adrielle Ayeni", seat: "seat7-7" },
+  { name: "Eunice Legaspi", seat: "seat7-8" },
+  { name: "Aldrin Legaspi", seat: "seat7-9" },
+  { name: "Silver Abuyan", seat: "seat7-10" },
 
-    "seat6-1": "table6",
-    "seat6-2": "table6",
-    "seat6-3": "table6",
-    "seat6-4": "table6",
-    "seat6-5": "table6",
-    "seat6-6": "table6",
-    "seat6-7": "table6",
-    "seat6-8": "table6",
-    "seat6-9": "table6",
+  { name: "Van Robles", seat: "seat4-1" },
+  { name: "Makayla Robles", seat: "seat4-2" },
+  { name: "Shelah Robles", seat: "seat4-3" },
 
-    "seat7-1": "table7",
-    "seat7-2": "table7",
-    "seat7-3": "table7",
-    "seat7-4": "table7",
-    "seat7-5": "table7",
-    "seat7-6": "table7",
-    "seat7-7": "table7",
-    "seat7-8": "table7",
-    "seat7-9": "table7",
-    "seat7-10": "table7"
-  };
+  { name: "Christopher Picondo", seat: "seat3-a" },
+  { name: "Mervin Gasco", seat: "seat3-b" },
+  { name: "Aileen Gasco", seat: "seat3-c" },
+  { name: "Rodelito Aguila", seat: "seat3-d" },
+  { name: "Sherlyn Aguila", seat: "seat3-e" },
+  { name: "Leah Robles", seat: "seat3-f" },
+  { name: "Martin Robles", seat: "seat3-g" },
+  { name: "Lysa Elchico", seat: "seat3-h" },
+  { name: "Rogelio Alsaybar", seat: "seat3-i" },
+  { name: "Lilian Alsaybar", seat: "seat3-j" },
+  { name: "Rose Lyn Flores", seat: "seat3-k" },
+  { name: "Michelle Chapman", seat: "seat3-l" },
+  { name: "John Chapman", seat: "seat3-m" },
+  { name: "Andrew Fenton", seat: "seat3-n" },
+  { name: "Dorrean Fenton", seat: "seat3-o" },
+  { name: "Pamela Picondo", seat: "seat3-p" }
+];
+</script>
+<script>
+/* Example:
+const guests = [
+  { name: "Angela Evangelista", seat: "seat1-2" },
+  ...
+];
+*/
+</script>
 
-  const guests = [
-    { name: "Angela Evangelista", seat: "seat1-2" },
-    { name: "Mark Evangelista", seat: "seat1-3" },
-    { name: "Melchiah Evangelista", seat: "seat1-4" },
-    { name: "Ethan Elchico", seat: "seat1-5" },
-    { name: "Ezekiel Plana", seat: "seat1-6" },
-    { name: "Ethan Plana", seat: "seat1-7" },
-    { name: "Johanna Plana", seat: "seat1-8" },
-    { name: "Aimee Sofocado", seat: "seat1-1" },
+<!-- SEAT → TABLE MAP -->
+<script>
+const seatToTable = {
+  "seat1-1": "table1","seat1-2": "table1","seat1-3": "table1","seat1-4": "table1","seat1-5": "table1","seat1-6": "table1","seat1-7": "table1","seat1-8": "table1",
+  "seat2-1": "table2","seat2-2": "table2","seat2-3": "table2","seat2-4": "table2","seat2-5": "table2","seat2-6": "table2","seat2-7": "table2","seat2-8": "table2",
+  "seat3-a": "table3","seat3-b": "table3","seat3-c": "table3","seat3-d": "table3","seat3-e": "table3","seat3-f": "table3","seat3-g": "table3","seat3-h": "table3",
+  "seat3-i": "table3","seat3-j": "table3","seat3-k": "table3","seat3-l": "table3","seat3-m": "table3","seat3-n": "table3","seat3-o": "table3","seat3-p": "table3",
+  "seat4-1": "table4","seat4-2": "table4","seat4-3": "table4",
+  "seat5-1": "table5","seat5-2": "table5","seat5-3": "table5","seat5-4": "table5","seat5-5": "table5","seat5-6": "table5","seat5-7": "table5","seat5-8": "table5","seat5-9": "table5","seat5-10": "table5",
+  "seat6-1": "table6","seat6-2": "table6","seat6-3": "table6","seat6-4": "table6","seat6-5": "table6","seat6-6": "table6","seat6-7": "table6","seat6-8": "table6","seat6-9","seat6-10": "table6",
+  "seat7-1": "table7","seat7-2": "table7","seat7-3": "table7","seat7-4": "table7","seat7-5": "table7","seat7-6": "table7","seat7-7": "table7","seat7-8": "table7","seat7-9": "table7","seat7-10": "table7"
+};
+</script>
+<script>
+/* Example:
+const seatToTable = {
+  "seat1-1": "table1",
+  ...
+};
+*/
+</script>
 
-    { name: "Daisy Esturas", seat: "seat2-2" },
-    { name: "Bernard Esturas", seat: "seat2-3" },
-    { name: "Lucia Esturas", seat: "seat2-4" },
-    { name: "Lucas Esturas", seat: "seat2-5" },
-    { name: "Eloise Plana", seat: "seat2-6" },
-    { name: "Erin Plana", seat: "seat2-7" },
-    { name: "Nicole Plana", seat: "seat2-8" },
-    { name: "Jerich Plana", seat: "seat2-1" },
+<!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
+<!-- ⭐ PASTE YOUR AUTOCOMPLETE SCRIPT HERE ⭐ -->
+<!-- AUTOCOMPLETE -->
+<script>
+const searchInput = document.getElementById("guest-search");
+const suggestionBox = document.getElementById("suggestions");
 
-    { name: "Nathan Osorio", seat: "seat6-1" },
-    { name: "Sarah Osorio", seat: "seat6-2" },
-    { name: "Therese Empestan", seat: "seat6-3" },
-    { name: "Analiza Villarino", seat: "seat6-4" },
-    { name: "Richard Villarino", seat: "seat6-5" },
-    { name: "Angelo Ayaman", seat: "seat6-6" },
-    { name: "Jackie Ayaman", seat: "seat6-7" },
-    { name: "Iza Almanza", seat: "seat6-8" },
-    { name: "Ace Almanza", seat: "seat6-9" },
+searchInput.addEventListener("input", function () {
+  let query = this.value.toLowerCase().trim();
 
-    { name: "Ivan Robles", seat: "seat5-1" },
-    { name: "Molly Robles", seat: "seat5-2" },
-    { name: "Cia Gopez", seat: "seat5-3" },
-    { name: "Keanu Robles", seat: "seat5-4" },
-    { name: "Gabriel Robles", seat: "seat5-5" },
-    { name: "Jonas Robles", seat: "seat5-6" },
-    { name: "Jay-Bee Alsaybar", seat: "seat5-7" },
-    { name: "Princess Alsaybar", seat: "seat5-8" },
-    { name: "Ken-Vee Hopcraft", seat: "seat5-9" },
-    { name: "Calvin Hopcraft", seat: "seat5-10" },
-
-    { name: "Brix Viguilla", seat: "seat7-1" },
-    { name: "Lavinia Sabado", seat: "seat7-2" },
-    { name: "Rolando Sabado", seat: "seat7-3" },
-    { name: "Paolo Pineda", seat: "seat7-4" },
-    { name: "Joy Demate", seat: "seat7-5" },
-    { name: "Oluwaleke Ayeni", seat: "seat7-6" },
-    { name: "Adrielle Ayeni", seat: "seat7-7" },
-    { name: "Eunice Legaspi", seat: "seat7-8" },
-    { name: "Aldrin Legaspi", seat: "seat7-9" },
-    { name: "Silver Abuyan", seat: "seat7-10" },
-
-    { name: "Van Robles", seat: "seat4-1" },
-    { name: "Makayla Robles", seat: "seat4-2" },
-    { name: "Shelah Robles", seat: "seat4-3" },
-
-    { name: "Christopher Picondo", seat: "seat3-a" },
-    { name: "Mervin Gasco", seat: "seat3-b" },
-    { name: "Aileen Gasco", seat: "seat3-c" },
-    { name: "Rodelito Aguila", seat: "seat3-d" },
-    { name: "Sherlyn Aguila", seat: "seat3-e" },
-    { name: "Leah Robles", seat: "seat3-f" },
-    { name: "Martin Robles", seat: "seat3-g" },
-    { name: "Lysa Elchico", seat: "seat3-h" },
-    { name: "Rogelio Alsaybar", seat: "seat3-i" },
-    { name: "Lilian Alsaybar", seat: "seat3-j" },
-    { name: "Rose Lyn Flores", seat: "seat3-k" },
-    { name: "Michelle Chapman", seat: "seat3-l" },
-    { name: "John Chapman", seat: "seat3-m" },
-    { name: "Andrew Fenton", seat: "seat3-n" },
-    { name: "Dorrean Fenton", seat: "seat3-o" },
-    { name: "Pamela Picondo", seat: "seat3-p" }
-  ];
-
-  const searchInput = document.getElementById("guest-search");
-  const suggestionsBox = document.getElementById("suggestions");
-
-  searchInput.addEventListener("input", function () {
-    let query = this.value.toLowerCase().trim();
-
-    if (query.length < 2) {
-      suggestionsBox.style.display = "none";
-      return;
-    }
-
-    const matches = guests.filter(g =>
-      g.name.toLowerCase().includes(query)
-    );
-
-    if (matches.length === 0) {
-      suggestionsBox.style.display = "none";
-      return;
-    }
-
-    suggestionsBox.innerHTML = matches
-      .map(m => `<div class="suggestion-item" data-seat="${m.seat}">
-                   ${m.name}
-                 </div>`)
-      .join("");
-
-    suggestionsBox.style.display = "block";
-  });
-
-  suggestionsBox.addEventListener("click", function (e) {
-    if (e.target.classList.contains("suggestion-item")) {
-      const seatId = e.target.getAttribute("data-seat");
-      const name = e.target.innerText;
-
-      searchInput.value = name;
-      suggestionsBox.style.display = "none";
-
-      showDetails(name, seatId);
-    }
-  });
-
-  function showDetails(name, seatId) {
-    document.getElementById("details-section").style.display = "block";
-
-    const table = seatToTable[seatId] || "Unknown";
-
-    document.getElementById("details-content").innerHTML = `
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Seat:</strong> ${seatId}</p>
-      <p><strong>Table:</strong> ${table}</p>
-      <button onclick="showMap('${seatId}')">Show me my seat</button>
-    `;
+  if (query.length < 2) {
+    suggestionBox.style.display = "none";
+    return;
   }
 
-  function showMap(seatId) {
-    document.getElementById("map-section").style.display = "block";
-    highlightSeat(seatId);
+  const matches = guests.filter(g =>
+    g.name.toLowerCase().includes(query)
+  );
+
+  if (matches.length === 0) {
+    suggestionBox.style.display = "none";
+    return;
   }
 
-  function goBack() {
-    document.getElementById("details-section").style.display = "none";
+  suggestionBox.innerHTML = matches
+    .map(m => `<div class="suggestion-item" data-seat="${m.seat}">
+                 ${m.name}
+               </div>`)
+    .join("");
+
+  suggestionBox.style.display = "block";
+});
+
+suggestionBox.addEventListener("click", function (e) {
+  if (e.target.classList.contains("suggestion-item")) {
+    const seatId = e.target.getAttribute("data-seat");
+    const guest = guests.find(g => g.seat === seatId);
+
+    document.getElementById("guest-name").innerText = "Guest: " + guest.name;
+    document.getElementById("guest-table").innerText = "Table: " + seatToTable[seatId].replace("table","");
+    document.getElementById("guest-seat").innerText = "Seat: " + seatId;
+
+    window.selectedSeat = seatId;
+
+    showScreen("screen-details");
   }
+});
+</script>
 
-  function goBackToDetails() {
-    document.getElementById("map-section").style.display = "none";
-    document.getElementById("details-section").style.display = "block";
+<!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
+<script>
+/* Your autocomplete JS goes here */
+</script>
+
+<script>
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function goToMap() {
+  showScreen("screen-map");
+  highlightSeat(window.selectedSeat);
+}
+
+function goBackToSearch() {
+  showScreen("screen-search");
+}
+
+function goBackToDetails() {
+  showScreen("screen-details");
+}
+</script>
+
+<script>
+function highlightSeat(seatId) {
+  document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+  document.querySelectorAll('.table-highlight').forEach(el => el.classList.remove('table-highlight'));
+
+  const seat = document.getElementById(seatId);
+  if (seat) seat.classList.add('highlight');
+
+  const tableId = seatToTable[seatId];
+  const table = document.getElementById(tableId);
+
+  if (table) {
+    table.classList.add('table-highlight');
   }
-
-  /* ⭐ INLINE SVG HIGHLIGHT — ALWAYS WORKS ⭐ */
-  function highlightSeat(seatId) {
-    const svg = document.querySelector("#map-container svg");
-    if (!svg) return;
-
-    svg.querySelectorAll("ellipse, circle, rect").forEach(el => {
-      el.classList.remove("highlight");
-    });
-
-    const seat = svg.querySelector(`#${seatId}`);
-    if (seat) {
-      seat.classList.add("highlight");
-      seat.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-  }
+}
 </script>
 
 </body>
