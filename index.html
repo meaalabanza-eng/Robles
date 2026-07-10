@@ -7,83 +7,93 @@
 <style>
   body {
     margin: 0;
-    font-family: "Playfair Display", serif;
-    background: #fff7fa;
-    color: #5a3e3e;
+    font-family: "Montserrat", sans-serif;
+    background: #fff7f8;
+    color: #333;
   }
 
   .screen {
     display: none;
-    padding: 30px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
   }
 
-  .active {
+  .screen.active {
     display: block;
   }
 
   h1 {
-    color: #d4af37;
-    text-shadow: 0 0 4px rgba(212,175,55,0.4);
+    font-family: "Playfair Display", serif;
+    font-size: 2.2rem;
+    color: #b37a8b;
+    text-align: center;
+    margin-bottom: 20px;
   }
 
-  #guest-search {
-    width: 100%;
-    padding: 14px;
-    border: 2px solid #d4af37;
-    border-radius: 10px;
-    font-size: 18px;
-    background: #fff;
-  }
-
-  #suggestions {
-    margin-top: 10px;
-    background: #fff;
-    border: 2px solid #d4af37;
-    border-radius: 10px;
-    display: none;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-
-  .suggestion-item {
-    padding: 12px;
+  .button, .back {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 18px;
+    border-radius: 999px;
     cursor: pointer;
-    border-bottom: 1px solid #f7c6d0;
-  }
-
-  .suggestion-item:hover {
-    background: #fdf3f7;
-    color: #d4af37;
-    font-weight: 600;
+    font-size: 0.95rem;
   }
 
   .button {
-    margin-top: 30px;
-    padding: 14px 20px;
     background: #d4af37;
-    color: white;
-    border-radius: 10px;
-    font-size: 20px;
-    text-align: center;
+    color: #fff;
+    margin-right: 10px;
+  }
+
+  .back {
+    background: #f4d7d7;
+    color: #555;
+  }
+
+  #search-input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+  }
+
+  #search-results {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    max-height: 220px;
+    overflow-y: auto;
+    background: #fff;
+  }
+
+  #search-results li {
+    padding: 8px 12px;
     cursor: pointer;
   }
 
-  /* ⭐ THIS FIXES DISTORTION ⭐ */
+  #search-results li:hover {
+    background: #f4d7d7;
+  }
+
   .map-container {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(212,175,55,0.15);
-    overflow: scroll;
     width: 100%;
-    height: 80vh;
+    max-width: 1200px;
+    margin: 20px auto;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    padding: 10px;
+    overflow: auto;
   }
 
   svg {
     width: auto;
     height: auto;
-    max-width: none;
-    max-height: none;
     display: block;
   }
 
@@ -100,26 +110,20 @@
     filter: drop-shadow(0 0 14px rgba(212,175,55,0.6));
   }
 
-  /* ⭐ ZOOM REMOVED ⭐ */
-  .zoom-target { }
-  .zoomed { }
-
-  .back {
-    margin-top: 20px;
-    font-size: 18px;
-    color: #d4af37;
-    cursor: pointer;
+  #guest-name, #guest-table, #guest-seat {
+    font-size: 1.05rem;
+    margin: 6px 0;
+    text-align: center;
   }
 </style>
 </head>
-
 <body>
 
 <!-- PAGE 1 — SEARCH -->
 <div id="screen-search" class="screen active">
   <h1>Find Your Seat</h1>
-  <input id="guest-search" type="text" placeholder="Search your name...">
-  <div id="suggestions"></div>
+  <input id="search-input" type="text" placeholder="Type your name…">
+  <ul id="search-results"></ul>
 </div>
 
 <!-- PAGE 2 — DETAILS -->
@@ -138,7 +142,6 @@
   <h1>Your Seat on the Map</h1>
 
   <div class="map-container">
-
     <svg
    version="1.1"
    id="svg1"
@@ -173,7 +176,7 @@
   <rect
      style="fill:#f4d7d7;stroke-width:0.725964"
      id="table6"
-     width="150.08876"
+     width="150.089"
      height="378.46719"
      x="142.18172"
      y="-1183.0188"
@@ -761,8 +764,10 @@
   <div class="back" onclick="goBackToDetails()">← Back to details</div>
 </div>
 
-<!-- GUEST LIST -->
 <script>
+/* ============================
+   GUEST LIST (YOUR DATA)
+   ============================ */
 const guests = [
   { name: "Angela Evangelista", seat: "seat1-2" },
   { name: "Mark Evangelista", seat: "seat1-3" },
@@ -771,7 +776,6 @@ const guests = [
   { name: "Ezekiel Plana", seat: "seat1-6" },
   { name: "Ethan Plana", seat: "seat1-7" },
   { name: "Johanna Plana", seat: "seat1-8" },
-  { name: "Aimee Sofocado", seat: "seat6-10" },
 
   { name: "Daisy Esturas", seat: "seat2-2" },
   { name: "Bernard Esturas", seat: "seat2-3" },
@@ -791,6 +795,7 @@ const guests = [
   { name: "Jackie Ayaman", seat: "seat6-7" },
   { name: "Iza Almanza", seat: "seat6-8" },
   { name: "Ace Almanza", seat: "seat6-9" },
+  { name: "Aimee Sofocado", seat: "seat6-10" },
 
   { name: "Ivan Robles", seat: "seat5-1" },
   { name: "Molly Robles", seat: "seat5-2" },
@@ -835,125 +840,106 @@ const guests = [
   { name: "Dorrean Fenton", seat: "seat3-o" },
   { name: "Pamela Picondo", seat: "seat3-p" }
 ];
-</script>
-<script>
-/* Example:
-const guests = [
-  { name: "Angela Evangelista", seat: "seat1-2" },
-  ...
-];
-*/
-</script>
 
-<!-- SEAT → TABLE MAP -->
-<script>
-const seatToTable = {
-  "seat1-1": "table1","seat1-2": "table1","seat1-3": "table1","seat1-4": "table1","seat1-5": "table1","seat1-6": "table1","seat1-7": "table1","seat1-8": "table1",
-  "seat2-1": "table2","seat2-2": "table2","seat2-3": "table2","seat2-4": "table2","seat2-5": "table2","seat2-6": "table2","seat2-7": "table2","seat2-8": "table2",
-  "seat3-a": "table3","seat3-b": "table3","seat3-c": "table3","seat3-d": "table3","seat3-e": "table3","seat3-f": "table3","seat3-g": "table3","seat3-h": "table3",
-  "seat3-i": "table3","seat3-j": "table3","seat3-k": "table3","seat3-l": "table3","seat3-m": "table3","seat3-n": "table3","seat3-o": "table3","seat3-p": "table3",
-  "seat4-1": "table4","seat4-2": "table4","seat4-3": "table4",
-  "seat5-1": "table5","seat5-2": "table5","seat5-3": "table5","seat5-4": "table5","seat5-5": "table5","seat5-6": "table5","seat5-7": "table5","seat5-8": "table5","seat5-9": "table5","seat5-10": "table5",
-  "seat6-1": "table6","seat6-2": "table6","seat6-3": "table6","seat6-4": "table6","seat6-5": "table6","seat6-6": "table6","seat6-7": "table6","seat6-8": "table6","seat6-9","seat6-10": "table6",
-  "seat7-1": "table7","seat7-2": "table7","seat7-3": "table7","seat7-4": "table7","seat7-5": "table7","seat7-6": "table7","seat7-7": "table7","seat7-8": "table7","seat7-9": "table7","seat7-10": "table7"
+/* ============================
+   SEAT PREFIX → TABLE
+   ============================ */
+const seatPrefixToTable = {
+  "seat1": "table1",
+  "seat2": "table2",
+  "seat3": "table3",
+  "seat4": "table4",
+  "seat5": "table5",
+  "seat6": "table6",
+  "seat7": "table7"
 };
-</script>
-<script>
-/* Example:
-const seatToTable = {
-  "seat1-1": "table1",
-  ...
-};
-*/
-</script>
 
-<!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
-<!-- ⭐ PASTE YOUR AUTOCOMPLETE SCRIPT HERE ⭐ -->
-<!-- AUTOCOMPLETE -->
-<script>
-const searchInput = document.getElementById("guest-search");
-const suggestionBox = document.getElementById("suggestions");
+let selectedGuest = null;
 
-searchInput.addEventListener("input", function () {
-  let query = this.value.toLowerCase().trim();
-
-  if (query.length < 2) {
-    suggestionBox.style.display = "none";
-    return;
-  }
-
-  const matches = guests.filter(g =>
-    g.name.toLowerCase().includes(query)
-  );
-
-  if (matches.length === 0) {
-    suggestionBox.style.display = "none";
-    return;
-  }
-
-  suggestionBox.innerHTML = matches
-    .map(m => `<div class="suggestion-item" data-seat="${m.seat}">
-                 ${m.name}
-               </div>`)
-    .join("");
-
-  suggestionBox.style.display = "block";
-});
-
-suggestionBox.addEventListener("click", function (e) {
-  if (e.target.classList.contains("suggestion-item")) {
-    const seatId = e.target.getAttribute("data-seat");
-    const guest = guests.find(g => g.seat === seatId);
-
-    document.getElementById("guest-name").innerText = "Guest: " + guest.name;
-    document.getElementById("guest-table").innerText = "Table: " + seatToTable[seatId].replace("table","");
-    document.getElementById("guest-seat").innerText = "Seat: " + seatId;
-
-    window.selectedSeat = seatId;
-
-    showScreen("screen-details");
-  }
-});
-</script>
-
-<!-- ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ -->
-<script>
-/* Your autocomplete JS goes here */
-</script>
-
-<script>
+/* ============================
+   SCREEN NAVIGATION
+   ============================ */
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-function goToMap() {
-  showScreen("screen-map");
-  highlightSeat(window.selectedSeat);
-}
+function goBackToSearch() { showScreen("screen-search"); }
+function goBackToDetails() { showScreen("screen-details"); }
 
-function goBackToSearch() {
-  showScreen("screen-search");
-}
+function goToDetails(guest) {
+  selectedGuest = guest;
 
-function goBackToDetails() {
+  const seatId = guest.seat;
+  const prefix = seatId.split("-")[0];
+  const tableId = seatPrefixToTable[prefix];
+
+  const seatSuffix = seatId.split("-")[1];
+  const seatLabel = isNaN(seatSuffix) ? `Seat ${seatSuffix.toUpperCase()}` : `Seat ${seatSuffix}`;
+  const tableLabel = `Table ${tableId.replace("table", "")}`;
+
+  document.getElementById("guest-name").textContent = `Name: ${guest.name}`;
+  document.getElementById("guest-table").textContent = `Table: ${tableLabel}`;
+  document.getElementById("guest-seat").textContent = `Seat: ${seatLabel}`;
+
   showScreen("screen-details");
 }
-</script>
 
-<script>
+function goToMap() {
+  showScreen("screen-map");
+  if (selectedGuest) highlightSeat(selectedGuest.seat);
+}
+
+/* ============================
+   SEARCH LOGIC
+   ============================ */
+const searchInput = document.getElementById("search-input");
+const searchResults = document.getElementById("search-results");
+
+searchInput.addEventListener("input", () => {
+  const query = searchInput.value.trim().toLowerCase();
+  searchResults.innerHTML = "";
+  if (!query) return;
+
+  const matches = guests.filter(g => g.name.toLowerCase().includes(query));
+
+  matches.forEach(guest => {
+    const li = document.createElement("li");
+    li.textContent = guest.name;
+    li.addEventListener("click", () => goToDetails(guest));
+    searchResults.appendChild(li);
+  });
+});
+
+/* ============================
+   HIGHLIGHT SEAT & TABLE
+   ============================ */
 function highlightSeat(seatId) {
-  document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
-  document.querySelectorAll('.table-highlight').forEach(el => el.classList.remove('table-highlight'));
+  const svg = document.querySelector(".map-container svg");
+  if (!svg) return;
 
-  const seat = document.getElementById(seatId);
-  if (seat) seat.classList.add('highlight');
+  svg.querySelectorAll("*").forEach(el => {
+    el.classList.remove("highlight");
+    el.classList.remove("table-highlight");
+  });
 
-  const tableId = seatToTable[seatId];
-  const table = document.getElementById(tableId);
+  const seat = svg.querySelector(`#${seatId}`);
+  if (seat) seat.classList.add("highlight");
+
+  const prefix = seatId.split("-")[0];
+  const tableId = seatPrefixToTable[prefix];
+  const table = svg.querySelector(`#${tableId}`);
 
   if (table) {
-    table.classList.add('table-highlight');
+    const shape = table.querySelector("rect, ellipse, circle, path, polygon, polyline") || table;
+    shape.classList.add("table-highlight");
+    shape.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  if (seat) {
+    setTimeout(() => {
+      seat.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 600);
   }
 }
 </script>
