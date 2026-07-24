@@ -14,7 +14,7 @@
 
   .screen {
     display: none;
-    max-width: 600px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 40px 20px;
   }
@@ -167,6 +167,13 @@
       height: auto;
     }
   }
+  /* ⭐ FORCE SVG TO SCALE ON MOBILE ⭐ */
+@media (max-width: 600px) {
+  .map-container svg {
+    width: 100% !important;
+    height: auto !important;
+  }
+}
 </style>
 </head>
 <body>
